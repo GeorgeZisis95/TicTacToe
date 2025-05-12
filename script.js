@@ -173,41 +173,58 @@ function captureSnapshot(board) {
 // Step 1: Get the array representing the board and show it on the page
 // Step 2: Each cell is represented by a button
 // Step 3: Add click event, when the player presses a button the text content updates
+// Step 4: Action equals the buttons datatype
+// Step 5: The game loop is inside the buttons' event listener
+// Step 6: When the game terminates, the game over screen function is called ->
+//         a) Wipes the buttons
+//         b) Creates play again button
+// Step 7: Same logic, add start game screen at the start
 
 boardContainer = document.querySelector(".board-container")
 
-let game = TicTacToe()
-game.getInitialState()
-
-let board = game.getBoard()
-let player = game.getPlayer()
-
-const rows = board.length
-const cols = board[0].length
-
-for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-        const button = document.createElement("button")
-        button.setAttribute("class", "board-square")
-        button.setAttribute("data-action", 3 * i + j)
-        button.addEventListener("click", playFunction)
-        boardContainer.appendChild(button)
-    }
+function startScreen() {
+    const button = document.createElement("button")
+    button.setAttribute("class", "start-game")
+    button.textContent = "Start Game"
+    button.addEventListener("click", createBoard)
+    boardContainer.appendChild(button)
 }
 
-function playFunction(event) {
-    if (event.target.textContent === "") {
-        event.target.textContent = player
-        action = event.target.dataset.action
-        game.getNextState(action, player)
-        game.changePlayer()
-        player = game.getPlayer()
-        results = game.getWinnerAndTerminated()
-        let winner = results.winner
-        let terminated = results.terminated
-        if (terminated) {
-            gameOverScreen(winner)
-            return
+function createBoard() {
+    boardContainer.textContent = ""
+
+    let game = TicTacToe()
+    game.getInitialState()
+
+    let board = game.getBoard()
+    let player = game.getPlayer()
+
+    const rows = board.length
+    const cols = board[0].length
+
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            const button = document.createElement("button")
+            button.setAttribute("class", "board-square")
+            button.setAttribute("data-action", 3 * i + j)
+            button.addEventListener("click", playFunction)
+            boardContainer.appendChild(button)
+        }
+    }
+
+    function playFunction(event) {
+        if (event.target.textContent === "") {
+            event.target.textContent = player
+            action = event.target.dataset.action
+            game.getNextState(action, player)
+            game.changePlayer()
+            player = game.getPlayer()
+            results = game.getWinnerAndTerminated()
+            let winner = results.winner
+            let terminated = results.terminated
+            if (terminated) {
+                gameOverScreen(winner)
+            }
         }
     }
 }
@@ -222,10 +239,16 @@ function gameOverScreen(winner) {
     textOne.textContent = "Game Over"
     textTwo.textContent = `Winner: ${winner}`
 
+    const button = document.createElement("button")
+    button.setAttribute("class", "play-again")
+    button.textContent = "Play Again"
+    button.addEventListener("click", createBoard)
+
     boardContainer.textContent = ""
     boardContainer.appendChild(textOne)
     boardContainer.appendChild(textTwo)
+    boardContainer.appendChild(button)
 }
 
-
+startScreen()
 
