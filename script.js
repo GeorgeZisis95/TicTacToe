@@ -179,8 +179,10 @@ function captureSnapshot(board) {
 //         a) Wipes the buttons
 //         b) Creates play again button
 // Step 7: Same logic, add start game screen at the start
+// Step 8: Make buttons non-interactive when game ends instead of wiping them!
 
 boardContainer = document.querySelector(".board-container")
+resultContainer = document.querySelector(".result-container")
 
 function startScreen() {
     const button = document.createElement("button")
@@ -192,12 +194,16 @@ function startScreen() {
 
 function createBoard() {
     boardContainer.textContent = ""
+    resultContainer.textContent = ""
 
     let game = TicTacToe()
     game.getInitialState()
 
     let board = game.getBoard()
     let player = game.getPlayer()
+    let results = game.getWinnerAndTerminated()
+    let winner = results.winner
+    let terminated = results.terminated
 
     const rows = board.length
     const cols = board[0].length
@@ -213,15 +219,15 @@ function createBoard() {
     }
 
     function playFunction(event) {
-        if (event.target.textContent === "") {
+        if (event.target.textContent === "" && terminated === false) {
             event.target.textContent = player
             action = event.target.dataset.action
             game.getNextState(action, player)
             game.changePlayer()
             player = game.getPlayer()
             results = game.getWinnerAndTerminated()
-            let winner = results.winner
-            let terminated = results.terminated
+            winner = results.winner
+            terminated = results.terminated
             if (terminated) {
                 gameOverScreen(winner)
             }
@@ -244,10 +250,9 @@ function gameOverScreen(winner) {
     button.textContent = "Play Again"
     button.addEventListener("click", createBoard)
 
-    boardContainer.textContent = ""
-    boardContainer.appendChild(textOne)
-    boardContainer.appendChild(textTwo)
-    boardContainer.appendChild(button)
+    resultContainer.appendChild(textOne)
+    resultContainer.appendChild(textTwo)
+    resultContainer.appendChild(button)
 }
 
 startScreen()
