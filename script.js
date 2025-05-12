@@ -171,23 +171,61 @@ function captureSnapshot(board) {
 // The Console Game runs fine! Now let's create the elements in the webpage!
 
 // Step 1: Get the array representing the board and show it on the page
-
-testBoard = [
-    ["O", "X", "O"],
-    ["X", " ", " "],
-    ["X", "O", " "],
-]
+// Step 2: Each cell is represented by a button
+// Step 3: Add click event, when the player presses a button the text content updates
 
 boardContainer = document.querySelector(".board-container")
 
-const rows = testBoard.length
-const cols = testBoard[0].length
+let game = TicTacToe()
+game.getInitialState()
+
+let board = game.getBoard()
+let player = game.getPlayer()
+
+const rows = board.length
+const cols = board[0].length
 
 for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
         const button = document.createElement("button")
         button.setAttribute("class", "board-square")
         button.setAttribute("data-action", 3 * i + j)
+        button.addEventListener("click", playFunction)
         boardContainer.appendChild(button)
     }
 }
+
+function playFunction(event) {
+    if (event.target.textContent === "") {
+        event.target.textContent = player
+        action = event.target.dataset.action
+        game.getNextState(action, player)
+        game.changePlayer()
+        player = game.getPlayer()
+        results = game.getWinnerAndTerminated()
+        let winner = results.winner
+        let terminated = results.terminated
+        if (terminated) {
+            gameOverScreen(winner)
+            return
+        }
+    }
+}
+
+function gameOverScreen(winner) {
+    const textOne = document.createElement("p")
+    const textTwo = document.createElement("p")
+
+    textOne.setAttribute("class", "text one")
+    textTwo.setAttribute("class", "text two")
+
+    textOne.textContent = "Game Over"
+    textTwo.textContent = `Winner: ${winner}`
+
+    boardContainer.textContent = ""
+    boardContainer.appendChild(textOne)
+    boardContainer.appendChild(textTwo)
+}
+
+
+
