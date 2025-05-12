@@ -3,13 +3,28 @@
 // Step 1: Store the GameBoard as an array inside of a GameBoard Object
 // Step 2: Check the board for available moves
 // Step 3: Get next state of the board
-// Step 4: Check if game is over and who won
+// Step 4: Check whether the game is over and who is the winner
+//  Step 4.1: Create a function that checks if all elements in a row are the same
+//  Step 4.2: Create a function that transposes the board -> 
+//              Check for cols becomes the same as check for rows
+//  Step 4.3: Create a function that returns arrays representing the diagonals
+// Step 5: Check if game loop works for console
+// Step 6: The board and player values change dynamically instead of having to pass
+//         them as arguments in functions every time.
 
-
-function Board() {
+function TicTacToe() {
     const rows = 3
     const cols = 3
     const board = []
+    let player = "X"
+
+    const getBoard = () => {
+        return board
+    }
+
+    const getPlayer = () => {
+        return player
+    }
 
     const getInitialState = () => {
         for (i = 0; i < rows; i++) {
@@ -18,10 +33,9 @@ function Board() {
                 board[i].push(" ")
             }
         }
-        return board;
     }
 
-    const getValidActions = (board) => {
+    const getValidActions = () => {
         let validActions = []
         for (i = 0; i < rows; i++) {
             for (j = 0; j < cols; j++) {
@@ -33,20 +47,21 @@ function Board() {
         return validActions
     }
 
-    const getNextState = (board, action, player) => {
-        let tempBoard = deepCopy(board)
+    const changePlayer = () => {
+        player = player === "X" ? "O" : "X"
+    }
+
+    const getNextState = (action, player) => {
         if (player === "O") {
-            tempBoard[~~(action / 3)][~~(action % 3)] = "O"
+            board[~~(action / 3)][~~(action % 3)] = "O"
         }
 
         if (player === "X") {
-            tempBoard[~~(action / 3)][~~(action % 3)] = "X"
+            board[~~(action / 3)][~~(action % 3)] = "X"
         }
-
-        return tempBoard
     }
 
-    const getWinnerAndTerminated = (board) => {
+    const getWinnerAndTerminated = () => {
         const allBoards = []
         const transposedBoard = transposeBoard(board)
         const diagonals = getDiags(board, 3)
@@ -93,14 +108,7 @@ function Board() {
         }
     }
 
-    const renderInConsole = (board) => {
-        console.log("Current Board:")
-        for (i = 0; i < rows; i++) {
-            console.log(...board[i])
-        }
-    }
-
-    return { getInitialState, getValidActions, getNextState, getWinnerAndTerminated, renderInConsole };
+    return { getBoard, getPlayer, getInitialState, getValidActions, changePlayer, getNextState, getWinnerAndTerminated };
 }
 
 function checkWinner(board, player) {
@@ -156,26 +164,30 @@ function getDiags(board, size) {
     return diags
 }
 
-function deepCopy(element) {
-    return JSON.parse(JSON.stringify(element))
+function captureSnapshot(board) {
+    return JSON.parse(JSON.stringify(board))
 }
 
-const game = Board()
-let state = game.getInitialState()
-let player = "X"
-let validActions
-let action
-console.log(state)
+// The Console Game runs fine! Now let's create the elements in the webpage!
 
-while (true) {
-    validActions = game.getValidActions(state)
-    action = validActions[Math.floor(Math.random() * validActions.length)]
-    state = game.getNextState(state, action, player)
-    console.log(state)
-    results = game.getWinnerAndTerminated(state)
-    if (results.terminated === true) {
-        console.log(`Winner is ${results.winner}`)
-        break
+// Step 1: Get the array representing the board and show it on the page
+
+testBoard = [
+    ["O", "X", "O"],
+    ["X", " ", " "],
+    ["X", "O", " "],
+]
+
+boardContainer = document.querySelector(".board-container")
+
+const rows = testBoard.length
+const cols = testBoard[0].length
+
+for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+        const button = document.createElement("button")
+        button.setAttribute("class", "board-square")
+        button.setAttribute("data-action", 3 * i + j)
+        boardContainer.appendChild(button)
     }
-    player = player === "X" ? "O" : "X"
 }
